@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivityViewPractice">
+
+    <TextView
+        android:id="@+id/greetingLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/clickMe"
+        android:layout_marginTop="-20dp"
+        android:text="@string/hello" />
+
+<!--        android:layout_centerInPatrent="true"-->
+<!--    <TextView-->
+<!--        android:id="@+id/userName"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/Gaurab"-->
+<!--        android:layout_alignBottom="@id/clickMe"-->
+<!--        android:layout_marginTop="-20dp"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        />-->
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/userNameTIL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:hint="Username">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/userNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="-40dp"
+            android:inputType="text"
+            android:minLines="4"
+             />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userNameTIL"
+        android:entries="@array/gender"
+        android:background="@drawable/rounded_4dp_grey_border"
+        android:padding="16dp"
+        android:layout_marginHorizontal="16dp"/>
+
+    <AbsoluteLayout
+        android:id="@+id/bellWrapper"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@id/spinner"
+        >
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/notifications_24"
+            app:tint="@color/gray"
+            android:layout_y="6dp"
+        />
+        <TextView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:text="10"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_x="48dp"
+            android:background="@drawable/circular_red_bg"
+            />
+    </AbsoluteLayout>
+
+    <LinearLayout
+        android:id="@+id/genderWrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/bellWrapper"
+        android:layout_marginHorizontal="10dp">
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/male"
+            android:layout_weight="1"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/female"
+            android:layout_weight="1"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/other"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/checkBoxWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/clickMe">
+        <CheckBox
+            android:id="@+id/addExtraCheese"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/addExtraCheese"
+            >
+        </CheckBox>
+        <CheckBox
+            android:id="@+id/addExtratoppings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/addExtraToppings">
+
+
+        </CheckBox>
+    </LinearLayout>
+
+
+
+    <Button
+        android:id="@+id/clickMe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="-20dp"
+        android:text="@string/click" />
+    </RelativeLayout>
