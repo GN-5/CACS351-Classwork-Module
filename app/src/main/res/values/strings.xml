@@ -85,4 +85,11 @@
     <string name="ten">Ten</string>
     <string name="message">Message</string>
     <string name="student_name_needed">Student name is required</string>
+    <string name="gender_needed">Please select a Gender</string>
+    <string name="optional_subjects_needed">Please select atleast one Optional Subject</string>
+    <string name="grade_needed">Please input a grade value</string>
+    <string name="optional_subjects_cannot_be_more_than_two">Please select 2 optional subjects</string>
+    <string name="gender_label">Gender</string>
+    <string name="grade_label">Grade</string>
+    <string name="isEnrolled_label">Enrolled</string>
 </resources>
