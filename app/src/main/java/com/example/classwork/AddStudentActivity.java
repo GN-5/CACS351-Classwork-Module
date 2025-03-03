@@ -1,6 +1,8 @@
 package com.example.classwork;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -11,19 +13,31 @@ import android.os.Bundle;
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
+import com.example.classwork.data.AppDatabase;
 import com.example.classwork.databinding.ActivityAddStudentBinding;
 import com.example.classwork.model.Grade;
 import com.example.classwork.model.OptionalSubject;
+import com.example.classwork.model.Student;
+import com.example.classwork.model.StudentDao;
 
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-public class AddStudentActivity extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
+public class AddStudentActivity
+        extends AppCompatActivity
+        implements View.OnClickListener,
+        RadioGroup.OnCheckedChangeListener,
+        CompoundButton.OnCheckedChangeListener,
+        AdapterView.OnItemSelectedListener {
 
     ActivityAddStudentBinding binding;
 
@@ -80,11 +94,25 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
 
     void initializeGradeAdapter(){
 
-        ArrayAdapter<Grade> gradeAdapter = new ArrayAdapter<>(
+        ArrayAdapter<Grade> gradeAdapter = new ArrayAdapter<Grade>(
                 AddStudentActivity.this,
                 android.R.layout.simple_spinner_dropdown_item,
                 grades
-        );
+        ){
+            @Override
+            public View getDropDownView(
+                    int position,
+                    @Nullable View convertView,
+                    @NonNull ViewGroup parent
+            ) {
+
+                CheckedTextView dropDownView = (CheckedTextView) super.getDropDownView(position, convertView, parent);
+                if(binding.gradeSpinnerItem.getSelectedItemPosition() == position){
+                    dropDownView.setTextColor(getColor(R.color.green));
+                }
+                return dropDownView;
+            }
+        };
         binding.gradeSpinnerItem.setAdapter(gradeAdapter);
     }
 
@@ -106,19 +134,81 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
 
         return isValid;
     }
-    private  boolean validate(){
-        if(!validateStudentName()){
+    //Task - validate all fields
+    private boolean validateGender(){
+        boolean isValid = true;
+
+        if(selectedGender == null){
+            isValid = false;
+            showMessage(getString(R.string.gender_needed));
+        }
+
+        return isValid;
+    }
+    private boolean validateOptionalSubjects(){
+        boolean isValid = true;
+        
+        if(selectedOptionalSubjects.isEmpty()){
+            isValid = false;
+            showMessage(getString(R.string.optional_subjects_needed));
+        } else if (selectedOptionalSubjects.size() != 2) {
+            isValid = false;
+            showMessage(getString(R.string.optional_subjects_cannot_be_more_than_two));
+        }
+
+        return isValid;
+    }
+
+    // Validate that a grade has been selected
+    private boolean validateGrade(){
+        boolean isValid = true;
+
+        if(selectedGrade == null) {
+            isValid = false;
+            showMessage(getString(R.string.grade_needed));
+        }
+
+        return isValid;
+    }
+
+    private boolean validate(){
+        if(!validateStudentName() || !validateGender() || !validateOptionalSubjects() || !validateGrade()){
             return false;
         }
-
         return true;
     }
-    //Task - validate all fields
+
 
     public void onClick(View view){
-        if(validate()){
-
+        if(validate()) {
+            addStudent();
         }
+    }
+
+    private void addStudent() {
+        String name = binding.studentName.getText().toString();
+        Gender gender = this.selectedGender;
+        Grade grade = this.selectedGrade;
+        boolean isEnrolled = this.isEnrolled;
+
+        Student student = new Student(
+                0,
+                name,
+                gender,
+                grade,
+                isEnrolled
+        );
+        AppDatabase appDatabase = AppDatabase.getInstance(AddStudentActivity.this);
+
+        StudentDao studentDao = appDatabase.studentDao();
+
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            studentDao.insertStudent(student);
+                                                        }
+                                                    }
+        );
     }
 
     //for Gender
@@ -144,7 +234,7 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
+        //show toast
     }
 
 
@@ -187,13 +277,13 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
             }
         }
 
-        Log.i(TAG, "onCheckChange :" +selectedOptionalSubjects);
-
 
         //checking for isEnrolled
-        else if(compoundButton.getId() == binding.isEnrolled.getId()){
+        else if(compoundButton.getId() == binding.isEnrolled.getId()) {
             isEnrolled = isChecked;
+
         }
+        Log.i(TAG, "onCheckChange :" + selectedOptionalSubjects);
     }
 
 }
