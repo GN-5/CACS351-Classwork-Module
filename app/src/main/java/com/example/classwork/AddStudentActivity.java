@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.ArraySet;
 import android.util.Log;
@@ -26,6 +27,7 @@ import com.example.classwork.model.Grade;
 import com.example.classwork.model.OptionalSubject;
 import com.example.classwork.model.Student;
 import com.example.classwork.model.StudentDao;
+import com.example.classwork.model.SubjectDao;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -201,14 +203,24 @@ public class AddStudentActivity
         AppDatabase appDatabase = AppDatabase.getInstance(AddStudentActivity.this);
 
         StudentDao studentDao = appDatabase.studentDao();
+        SubjectDao subjectDao = appDatabase.subjectDao();
 
         Executors.newSingleThreadExecutor().execute(new Runnable() {
                                                         @Override
                                                         public void run() {
                                                             studentDao.insertStudent(student);
+
+                                                            //subjectDao.insertSubject();
+                                                            //try to add optional subject for students here.
+                                                            navigateToStudentList();
                                                         }
                                                     }
         );
+    }
+
+    private void navigateToStudentList(){
+        Intent intent = new Intent(AddStudentActivity.this, StudentListActivity.class);
+        startActivity(intent);
     }
 
     //for Gender

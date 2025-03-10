@@ -9,10 +9,13 @@ import androidx.room.Database;
 
 import com.example.classwork.model.Student;
 import com.example.classwork.model.StudentDao;
+import com.example.classwork.model.Subject;
+import com.example.classwork.model.SubjectDao;
 
 @Database(
         entities = {
-                Student.class
+                Student.class,
+                Subject.class
         },
         version = 1,
         exportSchema = false
@@ -34,4 +37,5 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public abstract StudentDao studentDao();
+    public abstract SubjectDao subjectDao();
 }
