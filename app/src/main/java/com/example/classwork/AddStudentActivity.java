@@ -3,6 +3,7 @@ package com.example.classwork;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -13,6 +14,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.ArraySet;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,6 +29,7 @@ import com.example.classwork.model.Grade;
 import com.example.classwork.model.OptionalSubject;
 import com.example.classwork.model.Student;
 import com.example.classwork.model.StudentDao;
+import com.example.classwork.model.Subject;
 import com.example.classwork.model.SubjectDao;
 
 import java.util.ArrayList;
@@ -71,6 +74,7 @@ public class AddStudentActivity
 
         binding = ActivityAddStudentBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setSupportActionBar(binding.myToolbar);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets)->{
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -81,6 +85,12 @@ public class AddStudentActivity
     }
 
     private void initializeView(){
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setTitle(getString(R.string.all_students));
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         binding.addBtn.setOnClickListener(AddStudentActivity.this);
         binding.genderGroup.setOnCheckedChangeListener(AddStudentActivity.this);
         binding.gradeSpinnerItem.setOnItemSelectedListener(AddStudentActivity.this);
@@ -92,6 +102,17 @@ public class AddStudentActivity
 
         initializeGradeAdapter();
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection.
+        if(item.getItemId() == android.R.id.home){
+            finish();
+            return true;
+        }else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     void initializeGradeAdapter(){
@@ -208,10 +229,19 @@ public class AddStudentActivity
         Executors.newSingleThreadExecutor().execute(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            studentDao.insertStudent(student);
+                                                            long studentId = studentDao.insertStudent(student);
 
-                                                            //subjectDao.insertSubject();
-                                                            //try to add optional subject for students here.
+
+                                                            //TODO save optional subjects as well.
+                                                            for(OptionalSubject subject : selectedOptionalSubjects){
+                                                                subjectDao.insertSubject(
+                                                                        new Subject(
+                                                                                0,
+                                                                                subject.name(),
+                                                                                (int) studentId
+                                                                        ));
+                                                            }
+
                                                             navigateToStudentList();
                                                         }
                                                     }

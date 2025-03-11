@@ -1,7 +1,6 @@
 package com.example.classwork;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -9,16 +8,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.classwork.databinding.ItemStudentBinding;
 import com.example.classwork.model.Student;
+import com.example.classwork.model.StudentWithOptionalSubject;
 
 import java.util.List;
 
 public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.ViewHolder>{
 
-    public StudentListAdapter(List<Student> students) {
-        this.students = students;
+    public StudentListAdapter(List<StudentWithOptionalSubject> studentWithOptionalSubject) {
+        this.StudentWithOptionalSubject = studentWithOptionalSubject;
     }
 
-    private List<Student> students;
+    private List<StudentWithOptionalSubject> StudentWithOptionalSubject;
 
     @NonNull
     @Override
@@ -29,13 +29,13 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Student student = students.get(position);
-        holder.updateStudentDetails(student);
+        StudentWithOptionalSubject studentWithOptionalSubject = StudentWithOptionalSubject.get(position);
+        holder.updateStudentDetails(studentWithOptionalSubject);
     }
 
     @Override
     public int getItemCount() {
-        return students.size();
+        return StudentWithOptionalSubject.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
@@ -47,11 +47,11 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
             this.itemStudentBinding = itemView;
         }
 
-        void updateStudentDetails(Student student){
-            itemStudentBinding.studentName.setText(student.getName());
-            itemStudentBinding.genderValue.setText(student.getGender().toString());
-            itemStudentBinding.gradeValue.setText(student.getGrade().toString());
-            itemStudentBinding.isEnrolledValue.setText(String.valueOf(student.isEnrolled()));
+        void updateStudentDetails(StudentWithOptionalSubject studentWithOptionalSubject){
+            itemStudentBinding.studentName.setText(studentWithOptionalSubject.student.getName());
+            itemStudentBinding.genderValue.setText(studentWithOptionalSubject.student.getGender().toString());
+            itemStudentBinding.gradeValue.setText(studentWithOptionalSubject.student.getGrade().toString());
+            itemStudentBinding.isEnrolledValue.setText(String.valueOf(studentWithOptionalSubject.student.isEnrolled()));
         }
     }
 }
