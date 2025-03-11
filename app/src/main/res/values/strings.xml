@@ -92,4 +92,6 @@
     <string name="gender_label">Gender</string>
     <string name="grade_label">Grade</string>
     <string name="isEnrolled_label">Enrolled</string>
+    <string name="all_students">All Students</string>
+    <string name="add_student">Add Student</string>
 </resources>

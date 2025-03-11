@@ -1,0 +1,17 @@
+package com.example.classwork.model;
+
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.Relation;
+
+import java.util.List;
+
+public class StudentWithOptionalSubject {
+    @Embedded public Student student;
+    @Relation(
+            parentColumn = "id",
+            entityColumn = "user_id"
+    )
+    public List<Subject> subjects;
+
+}
