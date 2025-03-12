@@ -13,11 +13,21 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@id/moreOptions"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Gaurab Neupane"
         />
+    <ImageView
+        android:id="@+id/moreOptions"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:src="@drawable/baseline_more_vert_24"
+        android:contentDescription="@string/more_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/studentName"
+        app:layout_constraintBottom_toBottomOf="@id/studentName"/>
 
     <LinearLayout
         android:id="@+id/grade_and_gender_wrapper"
@@ -104,6 +114,27 @@
                 tools:text="True"/>
         </LinearLayout>
 
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/optional_subjects_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/isEnrolled_wrapper"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+        <TextView
+            android:id="@+id/optionalSubjectLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Optional Subjects" />
+
+        <TextView
+            android:id="@+id/optionalSubjectValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            tools:text="Math, Science" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

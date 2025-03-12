@@ -94,4 +94,6 @@
     <string name="isEnrolled_label">Enrolled</string>
     <string name="all_students">All Students</string>
     <string name="add_student">Add Student</string>
+    <string name="more_icon">More Options</string>
+    <string name="deleteStudent">Delete</string>
 </resources>

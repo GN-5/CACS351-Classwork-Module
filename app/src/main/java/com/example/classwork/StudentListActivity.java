@@ -24,7 +24,7 @@ import com.example.classwork.model.StudentWithOptionalSubject;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public class StudentListActivity extends AppCompatActivity {
+public class StudentListActivity extends AppCompatActivity implements StudentMenuClickListener{
     ActivityStudentListBinding binding;
 
 
@@ -38,12 +38,6 @@ public class StudentListActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.myToolbar);
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets)->{
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
         initializeView();
     }
     @Override
@@ -79,23 +73,30 @@ public class StudentListActivity extends AppCompatActivity {
     private void updateStudents(){
 
         Executors.newSingleThreadExecutor().execute(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            // get list of students from databases.
-                                                            List<StudentWithOptionalSubject> students = AppDatabase.getInstance(StudentListActivity.this).studentDao().getAll();
+            @Override
+            public void run() {
+                // get list of students from databases.
+                List<StudentWithOptionalSubject> students = AppDatabase.getInstance(StudentListActivity.this).studentDao().getAll();
 
-                                                            // initialize recycler view adapter
-                                                            StudentListAdapter studentListAdapter = new StudentListAdapter(students);
+                // initialize recycler view adapter
+                StudentListAdapter studentListAdapter = new StudentListAdapter(students, StudentListActivity.this);
 
-                                                            // pass adapter to recycler view
-                                                            runOnUiThread(()->{
-                                                                binding.studentRV.setAdapter(studentListAdapter);
-                                                                binding.studentRV.setLayoutManager(new LinearLayoutManager(StudentListActivity.this));
-                                                            });
-
-                                                        }
-                                                    }
+                 // pass adapter to recycler view
+                runOnUiThread(()->{
+                    binding.studentRV.setAdapter(studentListAdapter);
+                    binding.studentRV.setLayoutManager(new LinearLayoutManager(StudentListActivity.this));
+                });
+            }
+        }
         );
 
+    }
+
+    @Override
+    public void onDeleteClicked(StudentWithOptionalSubject studentWithOptionalSubject) {
+
+        Executors.newSingleThreadExecutor().execute(()->{
+            //TODO delete student
+        });
     }
 }
