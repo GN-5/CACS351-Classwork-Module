@@ -1,5 +1,7 @@
 package com.example.classwork;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -19,12 +21,20 @@ import com.example.classwork.data.AppDatabase;
 import com.example.classwork.databinding.ActivityAddStudentBinding;
 import com.example.classwork.databinding.ActivityStudentListBinding;
 import com.example.classwork.model.Student;
+import com.example.classwork.model.StudentDao;
 import com.example.classwork.model.StudentWithOptionalSubject;
 
 import java.util.List;
 import java.util.concurrent.Executors;
 
 public class StudentListActivity extends AppCompatActivity implements StudentMenuClickListener{
+
+    ActivityResultLauncher<Intent> updateStudentResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            (result) ->{
+                //TODO: will receive result here.
+            }
+    );
     ActivityStudentListBinding binding;
 
 
@@ -97,6 +107,23 @@ public class StudentListActivity extends AppCompatActivity implements StudentMen
 
         Executors.newSingleThreadExecutor().execute(()->{
             //TODO delete student
+            StudentDao studentDao = AppDatabase.getInstance(StudentListActivity.this).studentDao();
+            studentDao.deleteStudent(studentWithOptionalSubject.student);
+            updateStudents();
+
+
+        });
+    }
+    @Override
+    public void onEditClicked(StudentWithOptionalSubject studentWithOptionalSubject) {
+
+        Executors.newSingleThreadExecutor().execute(()->{
+            //TODO edit student
+            Intent intent = new Intent(StudentListActivity.this, AddStudentActivity.class);
+            intent.putExtra(AddStudentActivity.EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS, (CharSequence) studentWithOptionalSubject);
+            updateStudentResultLauncher.launch(intent);
+            startActivity(intent);
+
         });
     }
 }

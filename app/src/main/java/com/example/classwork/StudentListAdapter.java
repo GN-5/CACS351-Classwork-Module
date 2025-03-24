@@ -90,4 +90,5 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
 
 interface StudentMenuClickListener{
     void onDeleteClicked(StudentWithOptionalSubject studentWithOptionalSubject);
+    void onEditClicked(StudentWithOptionalSubject studentWithOptionalSubject);
 }

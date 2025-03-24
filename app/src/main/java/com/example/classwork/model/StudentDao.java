@@ -1,6 +1,7 @@
 package com.example.classwork.model;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -14,6 +15,9 @@ public interface StudentDao {
 
     @Query("SELECT * FROM student")
     List<StudentWithOptionalSubject> getAll();
+
+    @Delete
+    void deleteStudent(Student student);
 
 
 }
