@@ -29,6 +29,7 @@ import com.example.classwork.model.Grade;
 import com.example.classwork.model.OptionalSubject;
 import com.example.classwork.model.Student;
 import com.example.classwork.model.StudentDao;
+import com.example.classwork.model.StudentWithOptionalSubject;
 import com.example.classwork.model.Subject;
 import com.example.classwork.model.SubjectDao;
 
@@ -42,7 +43,7 @@ public class AddStudentActivity
         implements View.OnClickListener,
         RadioGroup.OnCheckedChangeListener,
         CompoundButton.OnCheckedChangeListener,
-        AdapterView.OnItemSelectedListener {
+        AdapterView.OnItemSelectedListener{
 
     ActivityAddStudentBinding binding;
 
@@ -65,6 +66,9 @@ public class AddStudentActivity
     Set<OptionalSubject> selectedOptionalSubjects = new ArraySet<>();
     private static final String TAG = "AddStudentActivity";
 
+    static final String EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS = "student_with_subjects";
+
+    StudentWithOptionalSubject studentWithOptionalSubject;
     boolean isEnrolled;
 
     @Override
@@ -81,6 +85,11 @@ public class AddStudentActivity
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        Intent intent = getIntent();
+        if(intent != null && intent.hasExtra(EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS)){
+            StudentWithOptionalSubject studentWithOptionalSubject = (StudentWithOptionalSubject) intent.getSerializableExtra(EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS);
+        }
         initializeView();
     }
 
@@ -99,6 +108,50 @@ public class AddStudentActivity
         binding.optSubjectComputer.setOnCheckedChangeListener(AddStudentActivity.this);
         binding.optSubjectEconomics.setOnCheckedChangeListener(AddStudentActivity.this);
         binding.isEnrolled.setOnCheckedChangeListener(AddStudentActivity.this);
+
+        if(studentWithOptionalSubject != null){
+            //name
+            binding.studentName.setText(studentWithOptionalSubject.student.getName());
+
+            //TODO gender group
+
+            //grade
+            int selectedIndex = -1;
+            for(int index = 0; index < grades.length; index++){
+                if(grades[index] == studentWithOptionalSubject.student.getGrade()){
+                    selectedIndex = index;
+                    break;
+                }
+            }
+            if(selectedIndex > -1){
+                binding.gradeSpinnerItem.setSelection(selectedIndex);
+            }
+
+            //optional subject
+            boolean isOptSubjectAccountSelected = false;
+            boolean isOptSubjectEconomicsSelected = false;
+            boolean isOptSubjectMathSelected = false;
+            boolean isOptSubjectComputerSelected = false;
+
+            for(Subject subject: studentWithOptionalSubject.subjects){
+                if(subject.getSubjectName().equals(OptionalSubject.ACCOUNTS.name())){
+                    isOptSubjectAccountSelected = true;
+                }
+                else if(subject.getSubjectName().equals(OptionalSubject.ECONOMICS.name())){
+                    isOptSubjectEconomicsSelected = true;
+                }
+                else if(subject.getSubjectName().equals(OptionalSubject.COMPUTER.name())){
+                    isOptSubjectComputerSelected = true;
+                }
+                else if(subject.getSubjectName().equals(OptionalSubject.OPTIONAL_MATH.name())){
+                    isOptSubjectMathSelected = true;
+                }
+            }
+            binding.optSubjectAccounts.setChecked(isOptSubjectAccountSelected);
+            binding.optSubjectEconomics.setChecked(isOptSubjectEconomicsSelected);
+            binding.optSubjectMath.setChecked(isOptSubjectMathSelected);
+            binding.optSubjectComputer.setChecked(isOptSubjectComputerSelected);
+        }
 
         initializeGradeAdapter();
 

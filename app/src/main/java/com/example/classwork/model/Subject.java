@@ -2,10 +2,23 @@ package com.example.classwork.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity
-public class Subject{
+import java.io.Serializable;
+
+@Entity(
+        foreignKeys = {
+                @ForeignKey(
+                        entity = Student.class,
+                        parentColumns = "id",
+                        childColumns = "user_id",
+                        onDelete = ForeignKey.CASCADE
+                )
+        }
+)
+public class Subject implements Serializable {
+
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     int id;

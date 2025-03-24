@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey;
 
 import com.example.classwork.Gender;
 
-@Entity
-public class Student {
+import java.io.Serializable;
 
+@Entity
+public class Student implements Serializable {
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     private int id;

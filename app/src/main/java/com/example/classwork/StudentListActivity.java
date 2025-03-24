@@ -1,5 +1,7 @@
 package com.example.classwork;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -19,12 +21,20 @@ import com.example.classwork.data.AppDatabase;
 import com.example.classwork.databinding.ActivityAddStudentBinding;
 import com.example.classwork.databinding.ActivityStudentListBinding;
 import com.example.classwork.model.Student;
+import com.example.classwork.model.StudentDao;
 import com.example.classwork.model.StudentWithOptionalSubject;
 
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public class StudentListActivity extends AppCompatActivity {
+public class StudentListActivity extends AppCompatActivity implements StudentMenuClickListener{
+
+    ActivityResultLauncher<Intent> updateStudentResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            (result) ->{
+                //TODO: will receive result here.
+            }
+    );
     ActivityStudentListBinding binding;
 
 
@@ -38,12 +48,6 @@ public class StudentListActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.myToolbar);
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets)->{
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
         initializeView();
     }
     @Override
@@ -79,23 +83,47 @@ public class StudentListActivity extends AppCompatActivity {
     private void updateStudents(){
 
         Executors.newSingleThreadExecutor().execute(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            // get list of students from databases.
-                                                            List<StudentWithOptionalSubject> students = AppDatabase.getInstance(StudentListActivity.this).studentDao().getAll();
+            @Override
+            public void run() {
+                // get list of students from databases.
+                List<StudentWithOptionalSubject> students = AppDatabase.getInstance(StudentListActivity.this).studentDao().getAll();
 
-                                                            // initialize recycler view adapter
-                                                            StudentListAdapter studentListAdapter = new StudentListAdapter(students);
+                // initialize recycler view adapter
+                StudentListAdapter studentListAdapter = new StudentListAdapter(students, StudentListActivity.this);
 
-                                                            // pass adapter to recycler view
-                                                            runOnUiThread(()->{
-                                                                binding.studentRV.setAdapter(studentListAdapter);
-                                                                binding.studentRV.setLayoutManager(new LinearLayoutManager(StudentListActivity.this));
-                                                            });
-
-                                                        }
-                                                    }
+                 // pass adapter to recycler view
+                runOnUiThread(()->{
+                    binding.studentRV.setAdapter(studentListAdapter);
+                    binding.studentRV.setLayoutManager(new LinearLayoutManager(StudentListActivity.this));
+                });
+            }
+        }
         );
 
+    }
+
+    @Override
+    public void onDeleteClicked(StudentWithOptionalSubject studentWithOptionalSubject) {
+
+        Executors.newSingleThreadExecutor().execute(()->{
+            //TODO delete student
+            StudentDao studentDao = AppDatabase.getInstance(StudentListActivity.this).studentDao();
+            studentDao.deleteStudent(studentWithOptionalSubject.student);
+            updateStudents();
+
+
+        });
+    }
+    @Override
+    public void onEditClicked(StudentWithOptionalSubject studentWithOptionalSubject) {
+
+        Executors.newSingleThreadExecutor().execute(()->{
+            //TODO edit student
+            Intent intent = new Intent(StudentListActivity.this, AddStudentActivity.class);
+            intent.putExtra(AddStudentActivity.EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS, (CharSequence) studentWithOptionalSubject);
+            updateStudentResultLauncher.launch(intent);
+            startActivity(intent);
+
+        });
     }
 }
