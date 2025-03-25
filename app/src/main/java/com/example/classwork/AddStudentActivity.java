@@ -114,6 +114,18 @@ public class AddStudentActivity
             binding.studentName.setText(studentWithOptionalSubject.student.getName());
 
             //TODO gender group
+            //region gender
+            switch(studentWithOptionalSubject.student.getGender()){
+                case MALE:
+                        binding.genderMale.setChecked(true);
+                        break;
+                case FEMALE:
+                        binding.genderFemale.setChecked(true);
+                        break;
+                case OTHERS:
+                        binding.genderOthers.setChecked(true);
+                        break;
+            }
 
             //grade
             int selectedIndex = -1;
