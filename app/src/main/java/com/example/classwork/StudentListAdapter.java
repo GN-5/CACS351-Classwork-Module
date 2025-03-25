@@ -71,7 +71,7 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
             }
             itemStudentBinding.optionalSubjectValue.setText(subjectsBuilder.toString());
             itemStudentBinding.moreOptions.setOnClickListener((view)->{
-                PopupMenu popup = new PopupMenu(this, v);
+                PopupMenu popup = new PopupMenu(view.getContext(), view);
 
                 // This activity implements OnMenuItemClickListener.
                 popup.setOnMenuItemClickListener(item ->{

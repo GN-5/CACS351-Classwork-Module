@@ -96,4 +96,8 @@
     <string name="add_student">Add Student</string>
     <string name="more_icon">More Options</string>
     <string name="deleteStudent">Delete</string>
+    <string name="edit_students">Edit Students</string>
+    <string name="add_students">Add Student</string>
+    <string name="edit">Edit</string>
+    <string name="update">Update</string>
 </resources>

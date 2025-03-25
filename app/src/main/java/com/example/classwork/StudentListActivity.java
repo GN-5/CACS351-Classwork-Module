@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,6 +34,14 @@ public class StudentListActivity extends AppCompatActivity implements StudentMen
             new ActivityResultContracts.StartActivityForResult(),
             (result) ->{
                 //TODO: will receive result here.
+                if(result.getResultCode() == RESULT_OK){
+                    Intent intent = result.getData();
+                    if(intent != null && intent.hasExtra(AddStudentActivity.EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS)){
+                        StudentWithOptionalSubject studentWithOptionalSubject =
+                                (StudentWithOptionalSubject) intent.getSerializableExtra(AddStudentActivity.EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS);
+                        Log.d("Gaurab", "Received Result: " + studentWithOptionalSubject);
+                    }
+                }
             }
     );
     ActivityStudentListBinding binding;
@@ -120,9 +129,8 @@ public class StudentListActivity extends AppCompatActivity implements StudentMen
         Executors.newSingleThreadExecutor().execute(()->{
             //TODO edit student
             Intent intent = new Intent(StudentListActivity.this, AddStudentActivity.class);
-            intent.putExtra(AddStudentActivity.EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS, (CharSequence) studentWithOptionalSubject);
+            intent.putExtra(AddStudentActivity.EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS, studentWithOptionalSubject);
             updateStudentResultLauncher.launch(intent);
-            startActivity(intent);
 
         });
     }

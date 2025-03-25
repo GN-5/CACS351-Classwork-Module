@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -88,7 +89,7 @@ public class AddStudentActivity
 
         Intent intent = getIntent();
         if(intent != null && intent.hasExtra(EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS)){
-            StudentWithOptionalSubject studentWithOptionalSubject = (StudentWithOptionalSubject) intent.getSerializableExtra(EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS);
+            studentWithOptionalSubject = (StudentWithOptionalSubject) intent.getSerializableExtra(EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS);
         }
         initializeView();
     }
@@ -96,11 +97,27 @@ public class AddStudentActivity
     private void initializeView(){
         ActionBar actionBar = getSupportActionBar();
         if(actionBar!=null){
-            actionBar.setTitle(getString(R.string.all_students));
+            if(studentWithOptionalSubject != null){
+                actionBar.setTitle(getString(R.string.edit_students));
+            }else {
+                actionBar.setTitle(getString(R.string.add_students));
+            }
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         binding.addBtn.setOnClickListener(AddStudentActivity.this);
+
+        if(studentWithOptionalSubject != null){
+            binding.addBtn.setText(getString(R.string.update));
+            binding.addBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    ContextCompat.getDrawable(
+                            AddStudentActivity.this,
+                            R.drawable.baseline_edit_24),
+                    null,
+                    null,
+                    null);
+        }
+
         binding.genderGroup.setOnCheckedChangeListener(AddStudentActivity.this);
         binding.gradeSpinnerItem.setOnItemSelectedListener(AddStudentActivity.this);
         binding.optSubjectAccounts.setOnCheckedChangeListener(AddStudentActivity.this);
@@ -108,6 +125,9 @@ public class AddStudentActivity
         binding.optSubjectComputer.setOnCheckedChangeListener(AddStudentActivity.this);
         binding.optSubjectEconomics.setOnCheckedChangeListener(AddStudentActivity.this);
         binding.isEnrolled.setOnCheckedChangeListener(AddStudentActivity.this);
+
+        //region editStudent
+        int selectedGradePosition = -1;
 
         if(studentWithOptionalSubject != null){
             //name
@@ -128,15 +148,15 @@ public class AddStudentActivity
             }
 
             //grade
-            int selectedIndex = -1;
+
             for(int index = 0; index < grades.length; index++){
                 if(grades[index] == studentWithOptionalSubject.student.getGrade()){
-                    selectedIndex = index;
+                    selectedGradePosition = index;
                     break;
                 }
             }
-            if(selectedIndex > -1){
-                binding.gradeSpinnerItem.setSelection(selectedIndex);
+            if(selectedGradePosition > -1){
+                binding.gradeSpinnerItem.setSelection(selectedGradePosition);
             }
 
             //optional subject
@@ -164,8 +184,9 @@ public class AddStudentActivity
             binding.optSubjectMath.setChecked(isOptSubjectMathSelected);
             binding.optSubjectComputer.setChecked(isOptSubjectComputerSelected);
         }
+        //endregion
 
-        initializeGradeAdapter();
+        initializeGradeAdapter(selectedGradePosition);
 
     }
 
@@ -180,7 +201,7 @@ public class AddStudentActivity
         }
     }
 
-    void initializeGradeAdapter(){
+    void initializeGradeAdapter(int selectedPosition){
 
         ArrayAdapter<Grade> gradeAdapter = new ArrayAdapter<Grade>(
                 AddStudentActivity.this,
@@ -195,6 +216,10 @@ public class AddStudentActivity
             ) {
 
                 CheckedTextView dropDownView = (CheckedTextView) super.getDropDownView(position, convertView, parent);
+
+                if(selectedPosition > -1){
+                    binding.gradeSpinnerItem.setSelection(selectedPosition);
+                }
                 if(binding.gradeSpinnerItem.getSelectedItemPosition() == position){
                     dropDownView.setTextColor(getColor(R.color.green));
                 }
@@ -277,40 +302,55 @@ public class AddStudentActivity
         String name = binding.studentName.getText().toString();
         Gender gender = this.selectedGender;
         Grade grade = this.selectedGrade;
+        int studentId = 0;
         boolean isEnrolled = this.isEnrolled;
+        if(studentWithOptionalSubject != null){
+            studentId = studentWithOptionalSubject.student.getId();
+        }
 
         Student student = new Student(
-                0,
+                studentId,
                 name,
                 gender,
                 grade,
                 isEnrolled
         );
-        AppDatabase appDatabase = AppDatabase.getInstance(AddStudentActivity.this);
 
-        StudentDao studentDao = appDatabase.studentDao();
-        SubjectDao subjectDao = appDatabase.subjectDao();
+        if(studentWithOptionalSubject == null){ //new student add
+            AppDatabase appDatabase = AppDatabase.getInstance(AddStudentActivity.this);
 
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            long studentId = studentDao.insertStudent(student);
+            StudentDao studentDao = appDatabase.studentDao();
+            SubjectDao subjectDao = appDatabase.subjectDao();
 
+            Executors.newSingleThreadExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    long studentId = studentDao.insertStudent(student);
 
-                                                            //TODO save optional subjects as well.
-                                                            for(OptionalSubject subject : selectedOptionalSubjects){
-                                                                subjectDao.insertSubject(
-                                                                        new Subject(
-                                                                                0,
-                                                                                subject.name(),
-                                                                                (int) studentId
-                                                                        ));
-                                                            }
+                    //TODO save optional subjects as well.
+                    for (OptionalSubject subject : selectedOptionalSubjects) {
+                        subjectDao.insertSubject(
+                                new Subject(
+                                        0,
+                                        subject.name(),
+                                        (int) studentId
+                                ));
+                    }
+                    navigateToStudentList();
+                }});
 
-                                                            navigateToStudentList();
-                                                        }
-                                                    }
-        );
+        }else{ //edit student
+            Intent intent = new Intent();
+            StudentWithOptionalSubject studentWithOptionalSubject = new StudentWithOptionalSubject();
+            studentWithOptionalSubject.student = student;
+            studentWithOptionalSubject.subjects = new ArrayList(selectedOptionalSubjects);
+            intent.putExtra(
+                    EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS,
+                    studentWithOptionalSubject
+            );
+            setResult(RESULT_OK, intent);
+            finish();
+        }
     }
 
     private void navigateToStudentList(){
