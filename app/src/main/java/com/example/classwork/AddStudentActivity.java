@@ -34,6 +34,7 @@ import com.example.classwork.model.StudentWithOptionalSubject;
 import com.example.classwork.model.Subject;
 import com.example.classwork.model.SubjectDao;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -183,7 +184,10 @@ public class AddStudentActivity
             binding.optSubjectEconomics.setChecked(isOptSubjectEconomicsSelected);
             binding.optSubjectMath.setChecked(isOptSubjectMathSelected);
             binding.optSubjectComputer.setChecked(isOptSubjectComputerSelected);
+
+            binding.isEnrolled.setChecked(studentWithOptionalSubject.student.isEnrolled());
         }
+
         //endregion
 
         initializeGradeAdapter(selectedGradePosition);
@@ -343,11 +347,22 @@ public class AddStudentActivity
             Intent intent = new Intent();
             StudentWithOptionalSubject studentWithOptionalSubject = new StudentWithOptionalSubject();
             studentWithOptionalSubject.student = student;
-            studentWithOptionalSubject.subjects = new ArrayList(selectedOptionalSubjects);
             intent.putExtra(
                     EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS,
                     studentWithOptionalSubject
             );
+
+            ArrayList<Subject> subjects = new ArrayList<>();
+            for(OptionalSubject subject: selectedOptionalSubjects){
+                subjects.add(
+                        new Subject(
+                                0,
+                                subject.name(),
+                                studentWithOptionalSubject.student.getId()
+                        )
+                );
+            }
+            studentWithOptionalSubject.subjects = subjects;
             setResult(RESULT_OK, intent);
             finish();
         }
