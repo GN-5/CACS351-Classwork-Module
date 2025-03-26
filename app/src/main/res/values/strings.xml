@@ -100,4 +100,8 @@
     <string name="add_students">Add Student</string>
     <string name="edit">Edit</string>
     <string name="update">Update</string>
+    <string name="delete_student_confirmation">Delete this Student?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_student_msg_format" />
 </resources>

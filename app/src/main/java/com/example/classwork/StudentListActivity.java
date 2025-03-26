@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,8 @@ import com.example.classwork.databinding.ActivityStudentListBinding;
 import com.example.classwork.model.Student;
 import com.example.classwork.model.StudentDao;
 import com.example.classwork.model.StudentWithOptionalSubject;
+import com.example.classwork.model.Subject;
+import com.example.classwork.model.SubjectDao;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -40,6 +43,7 @@ public class StudentListActivity extends AppCompatActivity implements StudentMen
                         StudentWithOptionalSubject studentWithOptionalSubject =
                                 (StudentWithOptionalSubject) intent.getSerializableExtra(AddStudentActivity.EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS);
                         Log.d("Gaurab", "Received Result: " + studentWithOptionalSubject);
+                        updateIndividualStudent(studentWithOptionalSubject);
                     }
                 }
             }
@@ -113,15 +117,25 @@ public class StudentListActivity extends AppCompatActivity implements StudentMen
 
     @Override
     public void onDeleteClicked(StudentWithOptionalSubject studentWithOptionalSubject) {
+        new AlertDialog.Builder(StudentListActivity.this)
+                .setTitle(R.string.delete)
+                .setMessage(R.string.delete_student_confirmation)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                    Executors.newSingleThreadExecutor().execute(()->{
+                        //TODO delete student
+                        StudentDao studentDao = AppDatabase.getInstance(StudentListActivity.this).studentDao();
+                        studentDao.deleteStudent(studentWithOptionalSubject.student);
+                        updateStudents();
 
-        Executors.newSingleThreadExecutor().execute(()->{
-            //TODO delete student
-            StudentDao studentDao = AppDatabase.getInstance(StudentListActivity.this).studentDao();
-            studentDao.deleteStudent(studentWithOptionalSubject.student);
-            updateStudents();
+
+                    });
+                    dialog.dismiss();
+                })
+                .setNegativeButton((R.string.cancel), (dialog, which)->{
+                    dialog.dismiss();
+                }).show();
 
 
-        });
     }
     @Override
     public void onEditClicked(StudentWithOptionalSubject studentWithOptionalSubject) {
@@ -132,6 +146,23 @@ public class StudentListActivity extends AppCompatActivity implements StudentMen
             intent.putExtra(AddStudentActivity.EXTRA_STUDENT_WITH_OPTIONAL_SUBJECTS, studentWithOptionalSubject);
             updateStudentResultLauncher.launch(intent);
 
+        });
+    }
+
+    private void updateIndividualStudent(StudentWithOptionalSubject studentWithOptionalSubject){
+        Executors.newSingleThreadScheduledExecutor().execute(()-> {
+            AppDatabase appDatabase = AppDatabase.getInstance(StudentListActivity.this);
+            SubjectDao subjectDao = appDatabase.subjectDao();
+            StudentDao studentDao = appDatabase.studentDao();
+
+            subjectDao.deleteSubjectHavingIds(studentWithOptionalSubject.student.getId());
+            studentDao.updateStudent(studentWithOptionalSubject.student);
+
+            for(Subject subject: studentWithOptionalSubject.subjects ){
+                subjectDao.insertSubject(subject);
+            }
+
+            updateStudents();
         });
     }
 }
